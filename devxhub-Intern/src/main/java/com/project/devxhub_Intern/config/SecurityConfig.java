@@ -5,6 +5,7 @@ import com.project.devxhub_Intern.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,15 +26,23 @@ public class SecurityConfig {
                         .requestMatchers("/public").permitAll()
                         .requestMatchers("/user").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/users").hasRole("ADMIN")
                         .anyRequest().authenticated()
-                );
+                ).httpBasic(Customizer.withDefaults());
         return http.build();
     }
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> userRepository.findByUsername(username)
+                .map(user -> org.springframework.security.core.userdetails.User
+                        .withUsername(user.getUsername())
+                        .password(user.getPassword())
+                        .roles(user.getRole())
+                        .build()
+                )
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
