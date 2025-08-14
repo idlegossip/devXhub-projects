@@ -4,6 +4,7 @@ import com.project.devxhub_Intern.dto.UserDto;
 import com.project.devxhub_Intern.model.User;
 import com.project.devxhub_Intern.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -40,10 +41,8 @@ public class UserController {
         try {
             User createdUser = userService.createUser(userDto);
             return ResponseEntity.ok(createdUser);
-        } catch (Exception ex) {
-            return ResponseEntity
-                    .status(500)
-                    .body("Error creating user: " + ex.getMessage());
+        }catch (RuntimeException ex){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }
     }
 }
