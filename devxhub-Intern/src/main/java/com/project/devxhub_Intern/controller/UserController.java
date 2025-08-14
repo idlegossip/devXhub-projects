@@ -1,13 +1,14 @@
 package com.project.devxhub_Intern.controller;
 
 import com.project.devxhub_Intern.dto.UserDto;
+import com.project.devxhub_Intern.error.Message;
 import com.project.devxhub_Intern.model.User;
 import com.project.devxhub_Intern.service.UserService;
 import jakarta.validation.Valid;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,8 +42,8 @@ public class UserController {
         try {
             User createdUser = userService.createUser(userDto);
             return ResponseEntity.ok(createdUser);
-        }catch (RuntimeException ex){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        }catch (Exception ex){
+            return new ResponseEntity<>(new Message("ERROR",ex.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
 }
